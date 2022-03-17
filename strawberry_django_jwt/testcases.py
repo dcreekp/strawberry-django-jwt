@@ -9,6 +9,7 @@ from strawberry_django_jwt.middleware import (
     JSONWebTokenMiddleware,
 )
 from strawberry_django_jwt.settings import jwt_settings
+from strawberry_django_jwt.shortcuts import get_token
 
 
 class SchemaRequestFactory(RequestFactory):
@@ -58,6 +59,13 @@ class JSONWebTokenClient(SchemaRequestFactory, Client):
     def authenticate(self, token):
         self._credentials = {
             jwt_settings.JWT_AUTH_HEADER_NAME: f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {token}",
+        }
+
+    def authenticate_user(self, user):
+        self._credentials = {
+            jwt_settings.JWT_AUTH_HEADER_NAME: (
+                f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
+            ),
         }
 
     def logout(self):
